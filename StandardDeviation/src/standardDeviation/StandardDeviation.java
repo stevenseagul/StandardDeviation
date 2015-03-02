@@ -10,7 +10,15 @@ import java.util.ArrayList;
 public class StandardDeviation 
 {
 	GridBagConstraints grid = new GridBagConstraints();
-	JTextField inputField = new JTextField(15);
+	
+	JFrame mainGUI;
+	
+	JLabel inputLabel;
+	
+	JTextField inputField;
+	
+	JButton calcStandardDeviationButton;
+	
 	
 	
 	
@@ -24,16 +32,16 @@ public class StandardDeviation
 	public StandardDeviation()
 	{
 		//init mainGUI
-		JFrame mainGUI = new JFrame();
+		mainGUI = new JFrame();
 		mainGUI.getContentPane().setLayout(new GridBagLayout());
 		mainGUI.setTitle("Standard Deviation");
 		mainGUI.setResizable(false);
 		mainGUI.setSize(400, 400);
 		
 		
-		initalizeTextFields(mainGUI);
-		initalizeLabels(mainGUI);
-		initalizeButtons(mainGUI);
+		initalizeTextFields();
+		initalizeLabels();
+		initalizeButtons();
 		
 		
 		mainGUI.addWindowListener(new WindowAdapter() {
@@ -50,37 +58,51 @@ public class StandardDeviation
 	
 	
 	
-	public void initalizeTextFields(JFrame mainGUI)
+	public void initalizeTextFields()
 	{
-		grid.gridx = 0;
+		inputField = new JTextField(15);
+		grid.gridx = 1;
 		grid.gridy = 0;
+		grid.insets = new Insets(4, 2, 2, 2);
 		mainGUI.add(inputField, grid);
 	}
 	
 	
 	
-	public void initalizeLabels(JFrame mainGUI)
+	public void initalizeLabels()
 	{
-		
+		inputLabel = new JLabel("Input: ");
+		grid.gridx = 0;
+		grid.gridy = 0;
+		grid.insets = new Insets(2, 10, 2, 2);
+		mainGUI.add(inputLabel, grid);
 	}
 	
 	
 	
-	public void initalizeButtons(JFrame mainGUI)
+	public void initalizeButtons()
 	{
-		JButton calcStandardDeviationButton = new JButton("Calculate Deviation");
-		grid.gridx = 0;
+		calcStandardDeviationButton = new JButton("Calculate Deviation");
+		grid.gridx = 1;
 		grid.gridy = 1;
-		grid.insets = new Insets(5, 5, 5, 5);
+		grid.insets = new Insets(2, 30, 5, 5);
 		mainGUI.add(calcStandardDeviationButton, grid);
+		
 		
 		calcStandardDeviationButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
-				getInput(inputField);
-				calcStandardDeviation();
+				ArrayList<Double> processedDouble = getInput(inputField);
+				if (processedDouble == null)
+					System.out.println("nothing usable entered");
+				else if (processedDouble.size() == 0)
+					System.out.println("no values put in");
+				else
+					calcStandardDeviation(processedDouble);
 			}
 		});
+		
+		
 	}
 	
 	
@@ -91,54 +113,100 @@ public class StandardDeviation
 		String rawInput = inputField.getText();
 		String garbage = "";
 		
+		boolean proceed = false;
 		
-		for (int i = 0; i <= rawInput.length() - 1; i++)
+		//regular expression to find all whitespace and replace w/ nothing
+		rawInput = rawInput.replaceAll("\\s+", "");
+		if (rawInput.matches("\\w+"))
 		{
-			//regular expression to find all whitespace and replace w/ nothing
-			rawInput = rawInput.replaceAll("\\s+", "");
+			warningPopUp();
+			proceed = false;
+		}
+		else
+		{
+			proceed = true;	
+		}
 			
+		
+		
+		
+		if (proceed == true)
+		{
 			
-			if (rawInput.charAt(i) == ',')
+			//go thru string and get values
+			for (int i = 0; i <= rawInput.length() - 1; i++)
 			{
-				double processedDouble = Double.valueOf(rawInput.substring(0, i));
-				
-				garbage = garbage + rawInput.substring(0, i);
-				rawInput = rawInput.substring(i + 1);
-				i = 0;
-				
-				
-				System.out.println(processedDouble);
-				
-				processedInput.add(processedDouble);
+				if (rawInput.charAt(i) == ',')
+				{
+					double processedDouble = Double.valueOf(rawInput.substring(0, i));
+					
+					garbage = garbage + rawInput.substring(0, i);
+					rawInput = rawInput.substring(i + 1);
+					i = 0;
+					
+					
+					processedInput.add(processedDouble);
+				}
+				else if (i == rawInput.length() - 1)
+				{
+					double processedDouble = Double.valueOf(rawInput.substring(0, i + 1));
+					
+					garbage = garbage + rawInput.substring(0, i + 1);
+					rawInput = rawInput.substring(i + 1);
+					i = 0;
+
+					
+					processedInput.add(processedDouble);
+				}
 			}
-			else if (i == rawInput.length() - 1)
-			{
-				double processedDouble = Double.valueOf(rawInput.substring(0, i + 1));
-				
-				garbage = garbage + rawInput.substring(0, i + 1);
-				rawInput = rawInput.substring(i + 1);
-				i = 0;
-				
-				
-				System.out.println(processedDouble);
-				
-				processedInput.add(processedDouble);
-			}
+			
+			return processedInput;
+		}
+		else
+		{
+			return null;
 		}
 		
 		
-		
-		System.out.println(processedInput);
-		return processedInput;
 		
 	}
 	
 	
 	
-	public void calcStandardDeviation()
+	public void calcStandardDeviation(ArrayList<Double> processedDouble)
 	{
 		
 	}
 	
 	
+	
+	public void warningPopUp()
+	{
+		JFrame warningGUI = new JFrame();
+		JLabel warningText = new JLabel("Invalid Characters");
+		
+		warningGUI.setTitle("!!!");
+		warningGUI.setResizable(false);
+		warningGUI.getContentPane().setLayout(new GridBagLayout());
+		
+		//make mainGUI not focusable
+		mainGUI.setFocusableWindowState(false);
+		calcStandardDeviationButton.setEnabled(false);
+		
+		
+		warningGUI.setSize(120, 50);
+		warningGUI.setVisible(true);
+		
+		grid.gridx = 0;
+		grid.gridy = 0;
+		warningGUI.add(warningText, grid);
+		
+		warningGUI.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e)
+			{
+				mainGUI.setFocusableWindowState(true);
+				calcStandardDeviationButton.setEnabled(true);
+			}
+		});
+	}
 }
