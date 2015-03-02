@@ -1,5 +1,8 @@
 package standardDeviation;
 
+//Jared Jacobsen
+//2015-3-1 Standard Deviation
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -12,11 +15,8 @@ public class StandardDeviation
 	GridBagConstraints grid = new GridBagConstraints();
 	
 	JFrame mainGUI;
-	
 	JLabel inputLabel;
-	
 	JTextField inputField;
-	
 	JButton calcStandardDeviationButton;
 	
 	
@@ -43,7 +43,7 @@ public class StandardDeviation
 		initalizeLabels();
 		initalizeButtons();
 		
-		
+		//proper exit
 		mainGUI.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e)
 			{
@@ -57,7 +57,7 @@ public class StandardDeviation
 	}
 	
 	
-	
+	//initialize swing textfields into mainGUI
 	public void initalizeTextFields()
 	{
 		inputField = new JTextField(15);
@@ -68,18 +68,18 @@ public class StandardDeviation
 	}
 	
 	
-	
+	//initialize swing labels into mainGUI
 	public void initalizeLabels()
 	{
 		inputLabel = new JLabel("Input: ");
 		grid.gridx = 0;
 		grid.gridy = 0;
-		grid.insets = new Insets(2, 10, 2, 2);
+		grid.insets = new Insets(2, 6, 2, 2);
 		mainGUI.add(inputLabel, grid);
 	}
 	
 	
-	
+	//initialize swing buttons into mainGUI
 	public void initalizeButtons()
 	{
 		calcStandardDeviationButton = new JButton("Calculate Deviation");
@@ -106,7 +106,7 @@ public class StandardDeviation
 	}
 	
 	
-	
+	//get inputs from textfield
 	public ArrayList<Double> getInput(JTextField inputField)
 	{
 		ArrayList<Double> processedInput = new ArrayList<Double>();
@@ -179,7 +179,7 @@ public class StandardDeviation
 	}
 	
 	
-	
+	//warning popup, happens when button clicked
 	public void warningPopUp()
 	{
 		JFrame warningGUI = new JFrame();
@@ -193,14 +193,11 @@ public class StandardDeviation
 		mainGUI.setFocusableWindowState(false);
 		calcStandardDeviationButton.setEnabled(false);
 		
-		
-		warningGUI.setSize(120, 50);
-		warningGUI.setVisible(true);
-		
 		grid.gridx = 0;
 		grid.gridy = 0;
 		warningGUI.add(warningText, grid);
 		
+		//refocus mainGUI
 		warningGUI.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e)
 			{
@@ -208,5 +205,8 @@ public class StandardDeviation
 				calcStandardDeviationButton.setEnabled(true);
 			}
 		});
+		
+		warningGUI.setSize(120, 50);
+		warningGUI.setVisible(true);
 	}
 }
