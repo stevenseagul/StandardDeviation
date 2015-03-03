@@ -18,6 +18,7 @@ public class StandardDeviation
 	JLabel inputLabel;
 	JTextField inputField;
 	JButton calcStandardDeviationButton;
+	JButton helpButton;
 	
 	
 	
@@ -45,6 +46,7 @@ public class StandardDeviation
 		
 		//proper exit
 		mainGUI.addWindowListener(new WindowAdapter() {
+			@Override
 			public void windowClosing(WindowEvent e)
 			{
 				System.exit(0);
@@ -61,6 +63,7 @@ public class StandardDeviation
 	public void initalizeTextFields()
 	{
 		inputField = new JTextField(15);
+		grid = new GridBagConstraints();
 		grid.gridx = 1;
 		grid.gridy = 0;
 		grid.insets = new Insets(4, 2, 2, 2);
@@ -72,6 +75,7 @@ public class StandardDeviation
 	public void initalizeLabels()
 	{
 		inputLabel = new JLabel("Input: ");
+		grid = new GridBagConstraints();
 		grid.gridx = 0;
 		grid.gridy = 0;
 		grid.insets = new Insets(2, 6, 2, 2);
@@ -83,6 +87,7 @@ public class StandardDeviation
 	public void initalizeButtons()
 	{
 		calcStandardDeviationButton = new JButton("Calculate Deviation");
+		grid = new GridBagConstraints();
 		grid.gridx = 1;
 		grid.gridy = 1;
 		grid.insets = new Insets(2, 30, 5, 5);
@@ -90,15 +95,33 @@ public class StandardDeviation
 		
 		
 		calcStandardDeviationButton.addActionListener(new ActionListener() {
+			double mean;
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
-				ArrayList<Double> processedDouble = getInput(inputField);
-				if (processedDouble == null)
+				ArrayList<Double> processedInputArray = getInput(inputField);
+				if (processedInputArray == null)
 					System.out.println("nothing usable entered");
-				else if (processedDouble.size() == 0)
+				else if (processedInputArray.size() == 0)
 					System.out.println("no values put in");
 				else
-					calcStandardDeviation(processedDouble);
+					mean = calcMean(processedInputArray);
+					calcStandardDeviation(processedInputArray, mean);
+			}
+		});
+		
+		helpButton = new JButton("Help");
+		grid = new GridBagConstraints();
+		grid.gridx = 0;
+		grid.gridy = 1;
+		grid.insets = new Insets(0, 5, 5, 0);
+		mainGUI.add(helpButton, grid);
+		
+		helpButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				helpPopUp();
 			}
 		});
 		
@@ -109,14 +132,13 @@ public class StandardDeviation
 	//get inputs from textfield
 	public ArrayList<Double> getInput(JTextField inputField)
 	{
-		ArrayList<Double> processedInput = new ArrayList<Double>();
+		ArrayList<Double> processedInputArray = new ArrayList<Double>();
 		String rawInput = inputField.getText();
-		String garbage = "";
 		
 		boolean proceed = false;
 		
 		//regular expression to find all whitespace and replace w/ nothing
-		rawInput = rawInput.replaceAll("\\s+", "");
+		rawInput = rawInput.replaceAll("(\\s+)", "");
 		if (rawInput.matches("\\w+"))
 		{
 			warningPopUp();
@@ -136,31 +158,40 @@ public class StandardDeviation
 			//go thru string and get values
 			for (int i = 0; i <= rawInput.length() - 1; i++)
 			{
+				//System.out.println(rawInput.charAt(i) + " : is last char " + (i == rawInput.length() - 1));
+				
 				if (rawInput.charAt(i) == ',')
 				{
-					double processedDouble = Double.valueOf(rawInput.substring(0, i));
+					double processedInputCurrent = Double.valueOf(rawInput.substring(0, i));
 					
-					garbage = garbage + rawInput.substring(0, i);
+					
 					rawInput = rawInput.substring(i + 1);
-					i = 0;
+					
+					i = -1;
 					
 					
-					processedInput.add(processedDouble);
+					processedInputArray.add(processedInputCurrent);
 				}
+				
+				
 				else if (i == rawInput.length() - 1)
 				{
-					double processedDouble = Double.valueOf(rawInput.substring(0, i + 1));
 					
-					garbage = garbage + rawInput.substring(0, i + 1);
+					
+					double processedInputCurrent = Double.valueOf(rawInput.substring(0, i + 1));
+					
+					
 					rawInput = rawInput.substring(i + 1);
-					i = 0;
+					
+					i = -1;
 
 					
-					processedInput.add(processedDouble);
+					processedInputArray.add(processedInputCurrent);
 				}
 			}
 			
-			return processedInput;
+			System.out.println("processedInputArray = " + processedInputArray);
+			return processedInputArray;
 		}
 		else
 		{
@@ -171,10 +202,37 @@ public class StandardDeviation
 		
 	}
 	
-	
-	
-	public void calcStandardDeviation(ArrayList<Double> processedDouble)
+	//calc mean for data
+	public double calcMean(ArrayList<Double> processedInputArray)
 	{
+		System.out.println("calcMean ran");
+		
+		double total = 0;
+		
+		for (int i = 0; i <= processedInputArray.size() - 1; i++)
+		{
+			total += processedInputArray.get(i);
+		}
+		
+		System.out.println("mean: " + total / processedInputArray.size());
+		return total / processedInputArray.size();
+	}
+	
+	
+	
+	public double calcStandardDeviation(ArrayList<Double> processedInputArray, double mean)
+	{
+		System.out.println("calcStandardDeviation ran");
+
+		double totalDifferences = 0.0;
+		
+		for (int i = 0; i <= processedInputArray.size() - 1; i++)
+		{
+			totalDifferences += Math.pow((processedInputArray.get(i) - mean), 2);
+		}
+
+		System.out.println("standard deviation: " + Math.sqrt(totalDifferences/processedInputArray.size()));
+		return Math.sqrt(totalDifferences/processedInputArray.size());
 		
 	}
 	
@@ -182,6 +240,8 @@ public class StandardDeviation
 	//warning popup, happens when button clicked
 	public void warningPopUp()
 	{
+		System.out.println("warningPopUp ran");
+		
 		JFrame warningGUI = new JFrame();
 		JLabel warningText = new JLabel("Invalid Characters");
 		
@@ -192,21 +252,66 @@ public class StandardDeviation
 		//make mainGUI not focusable
 		mainGUI.setFocusableWindowState(false);
 		calcStandardDeviationButton.setEnabled(false);
+		helpButton.setEnabled(false);
 		
+		grid = new GridBagConstraints();
 		grid.gridx = 0;
 		grid.gridy = 0;
+		grid.insets = new Insets(10, 10, 10, 10);
 		warningGUI.add(warningText, grid);
 		
 		//refocus mainGUI
 		warningGUI.addWindowListener(new WindowAdapter() {
+			@Override
 			public void windowClosing(WindowEvent e)
 			{
 				mainGUI.setFocusableWindowState(true);
 				calcStandardDeviationButton.setEnabled(true);
+				helpButton.setEnabled(true);
+				warningGUI.setVisible(false);
 			}
 		});
 		
-		warningGUI.setSize(120, 50);
+		warningGUI.pack();
 		warningGUI.setVisible(true);
+	}
+	
+	public void helpPopUp()
+	{
+		System.out.println("helpPopUp ran");
+		
+		JFrame helpGUI = new JFrame();
+		JLabel helpText = new JLabel("Enter only numbers/decimals, seperate each with inputs with commas");
+		
+		helpGUI.setTitle("Help");
+		helpGUI.setResizable(false);
+		helpGUI.getContentPane().setLayout(new GridBagLayout());
+		
+		//make mainGUI not focusable
+		mainGUI.setFocusableWindowState(false);
+		calcStandardDeviationButton.setEnabled(false);
+		helpButton.setEnabled(false);
+		
+		helpText.setFont(new Font("Arial", 5, 14));
+		grid = new GridBagConstraints();
+		grid.gridx = 0;
+		grid.gridy = 0;
+		grid.insets = new Insets(10, 10, 10, 10);
+		helpGUI.add(helpText, grid);
+		
+		//refocus mainGUI
+		helpGUI.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e)
+			{
+				mainGUI.setFocusableWindowState(true);
+				calcStandardDeviationButton.setEnabled(true);
+				helpButton.setEnabled(true);
+				helpGUI.setVisible(false);
+			}
+		});
+		
+		helpGUI.pack();
+		helpGUI.setVisible(true);
 	}
 }
