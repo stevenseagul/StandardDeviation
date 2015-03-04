@@ -17,6 +17,7 @@ public class StandardDeviation
 	JFrame mainGUI;
 	JLabel inputLabel;
 	JTextField inputField;
+	JTextField answerField;
 	JButton calcStandardDeviationButton;
 	JButton helpButton;
 	
@@ -68,6 +69,13 @@ public class StandardDeviation
 		grid.gridy = 0;
 		grid.insets = new Insets(4, 2, 2, 2);
 		mainGUI.add(inputField, grid);
+		
+		answerField = new JTextField(15);
+		grid = new GridBagConstraints();
+		grid.gridx = 1;
+		grid.gridy = 2;
+		grid.insets = new Insets(2, 2, 2, 2);
+		mainGUI.add(answerField, grid);
 	}
 	
 	
@@ -106,7 +114,7 @@ public class StandardDeviation
 					System.out.println("no values put in");
 				else
 					mean = calcMean(processedInputArray);
-					calcStandardDeviation(processedInputArray, mean);
+					answerField.setText(String.valueOf(calcStandardDeviation(processedInputArray, mean)));
 			}
 		});
 		
